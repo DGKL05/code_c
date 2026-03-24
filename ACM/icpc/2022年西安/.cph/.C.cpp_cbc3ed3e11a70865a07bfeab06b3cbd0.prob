@@ -1,0 +1,1 @@
+{"name":"Local: C","url":"d:\\codefield\\CODE_C\\ACM\\icpc\\2022年西安\\C.cpp","tests":[{"id":1762005109447,"input":"6\n1 1 1\n2 3 3\n9 9 9\n3 26 47\n1064 822 1048576\n1 1 512\n","output":"1\n7\n45\n44\n21860\n31\n11"}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"d:\\codefield\\CODE_C\\ACM\\icpc\\2022年西安\\C.cpp","group":"local","local":true}

@@ -1,0 +1,1 @@
+{"name":"Local: A","url":"d:\\codefield\\CODE_C\\ACM\\牛客\\2026寒假\\01\\A.cpp","tests":[{"id":1770099557252,"input":"3\n2\n1 2\n3 4\n4\n1 8 7 2\n3 6 4 5\n5\n9 8 2 3 1\n10 7 5 6 4","output":"2\n4\n12"}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"d:\\codefield\\CODE_C\\ACM\\牛客\\2026寒假\\01\\A.cpp","group":"local","local":true}

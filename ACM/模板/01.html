@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>状态压缩DP算法解析</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+        .card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .code-block {
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            background-color: #1e293b;
+            color: #f8fafc;
+            border-radius: 0.375rem;
+        }
+        .state-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.75rem;
+            height: 1.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <!-- 标题部分 -->
+        <div class="text-center mb-12">
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">状态压缩DP算法解析</h1>
+            <p class="text-lg text-slate-600 max-w-2xl mx-auto">计算覆盖所有成对任务的最小路径代价</p>
+        </div>
+
+        <!-- 核心逻辑卡片 -->
+        <div class="card bg-white rounded-xl shadow-md overflow-hidden mb-8">
+            <div class="p-6 md:p-8">
+                <div class="flex items-center mb-6">
+                    <div class="bg-blue-100 text-blue-800 p-3 rounded-full mr-4">
+                        <i class="fas fa-code text-xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800">核心逻辑解析</h2>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- 状态枚举 -->
+                    <div class="bg-slate-50 rounded-lg p-5">
+                        <div class="flex items-center mb-3">
+                            <span class="state-badge bg-blue-100 text-blue-800 mr-3">1</span>
+                            <h3 class="font-semibold text-lg text-slate-800">状态枚举</h3>
+                        </div>
+                        <p class="text-slate-600">外层循环遍历所有8位状态<code class="bg-slate-200 px-1 rounded">s</code>（范围<code class="bg-slate-200 px-1 rounded">0</code>到<code class="bg-slate-200 px-1 rounded">2^8-1</code>）。<code class="bg-slate-200 px-1 rounded">check(s)</code>过滤非法状态（每组两位不一致的状态），仅处理合法状态。</p>
+                    </div>
+                    
+                    <!-- 初始化状态代价 -->
+                    <div class="bg-slate-50 rounded-lg p-5">
+                        <div class="flex items-center mb-3">
+                            <span class="state-badge bg-blue-100 text-blue-800 mr-3">2</span>
+                            <h3 class="font-semibold text-lg text-slate-800">初始化状态代价</h3>
+                        </div>
+                        <div class="code-block p-4 mb-3 overflow-x-auto">
+                            <pre class="text-sm">for(int i = 1; i <= n; ++i) 
+    f[s] = min(dp[i][s], f[s]);</pre>
+                        </div>
+                        <p class="text-slate-600"><code class="bg-slate-200 px-1 rounded">dp[i][s]</code>表示从节点<code class="bg-slate-200 px-1 rounded">i</code>出发，完成状态<code class="bg-slate-200 px-1 rounded">s</code>对应任务的最小代价。</p>
+                    </div>
+                    
+                    <!-- 子状态分解优化 -->
+                    <div class="bg-slate-50 rounded-lg p-5 md:col-span-2">
+                        <div class="flex items-center mb-3">
+                            <span class="state-badge bg-blue-100 text-blue-800 mr-3">3</span>
+                            <h3 class="font-semibold text-lg text-slate-800">子状态分解优化</h3>
+                        </div>
+                        <div class="code-block p-4 mb-3 overflow-x-auto">
+                            <pre class="text-sm">for(int subs = s & (s-1); subs; subs = s & (subs - 1)) {
+    if(check(subs)) continue;
+    f[s] = min(f[subs] + f[s ^ subs], f[s]);
+}</pre>
+                        </div>
+                        <p class="text-slate-600">枚举<code class="bg-slate-200 px-1 rounded">s</code>的所有非空子集<code class="bg-slate-200 px-1 rounded">subs</code>，确保<code class="bg-slate-200 px-1 rounded">subs</code>和<code class="bg-slate-200 px-1 rounded">s^subs</code>均为合法状态。将状态<code class="bg-slate-200 px-1 rounded">s</code>拆分为两个合法子状态<code class="bg-slate-200 px-1 rounded">subs</code>和<code class="bg-slate-200 px-1 rounded">s^subs</code>，合并两者的最小代价。</p>
+                    </div>
+                    
+                    <!-- 最终目标 -->
+                    <div class="bg-slate-50 rounded-lg p-5 md:col-span-2">
+                        <div class="flex items-center mb-3">
+                            <span class="state-badge bg-blue-100 text-blue-800 mr-3">4</span>
+                            <h3 class="font-semibold text-lg text-slate-800">最终目标</h3>
+                        </div>
+                        <p class="text-slate-600"><code class="bg-slate-200 px-1 rounded">f[(1<<8)-1]</code>表示覆盖全部4对任务（8位全1）的最小代价，即最终结果。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 应用场景 -->
+        <div class="card bg-white rounded-xl shadow-md overflow-hidden mb-8">
+            <div class="p-6 md:p-8">
+                <div class="flex items-center mb-6">
+                    <div class="bg-green-100 text-green-800 p-3 rounded-full mr-4">
+                        <i class="fas fa-map-marked-alt text-xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800">应用场景</h2>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-green-50 rounded-lg p-5">
+                        <h3 class="font-semibold text-lg text-green-800 mb-3">成对任务覆盖</h3>
+                        <p class="text-slate-600">例如物流配送问题，需同时访问4对起点-终点（每对占2位），合法状态要求每对的两位同时选中或未选中。</p>
+                    </div>
+                    
+                    <div class="bg-green-50 rounded-lg p-5">
+                        <h3 class="font-semibold text-lg text-green-800 mb-3">路径优化</h3>
+                        <p class="text-slate-600">结合图的最短路径（Dijkstra）与状态压缩DP，确保以最小代价完成所有任务对。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 关键步骤解释 -->
+        <div class="card bg-white rounded-xl shadow-md overflow-hidden mb-8">
+            <div class="p-6 md:p-8">
+                <div class="flex items-center mb-6">
+                    <div class="bg-purple-100 text-purple-800 p-3 rounded-full mr-4">
+                        <i class="fas fa-key text-xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800">关键步骤解释</h2>
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="flex">
+                        <div class="mr-4 mt-1">
+                            <div class="bg-purple-100 text-purple-800 w-8 h-8 rounded-full flex items-center justify-center font-semibold">1</div>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-lg text-slate-800 mb-2">状态合法性</h3>
+                            <p class="text-slate-600">通过<code class="bg-slate-200 px-1 rounded">check(s)</code>确保每组任务被正确处理，避免中间状态无效。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex">
+                        <div class="mr-4 mt-1">
+                            <div class="bg-purple-100 text-purple-800 w-8 h-8 rounded-full flex items-center justify-center font-semibold">2</div>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-lg text-slate-800 mb-2">动态规划优化</h3>
+                            <p class="text-slate-600">通过子状态分解，避免重复计算，逐步合并子问题的最优解。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex">
+                        <div class="mr-4 mt-1">
+                            <div class="bg-purple-100 text-purple-800 w-8 h-8 rounded-full flex items-center justify-center font-semibold">3</div>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-lg text-slate-800 mb-2">最终结果</h3>
+                            <p class="text-slate-600"><code class="bg-slate-200 px-1 rounded">f[255]</code>（即<code class="bg-slate-200 px-1 rounded">0b11111111</code>）代表所有4对任务均被完成的最小代价。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 示例说明 -->
+        <div class="card bg-white rounded-xl shadow-md overflow-hidden mb-8">
+            <div class="p-6 md:p-8">
+                <div class="flex items-center mb-6">
+                    <div class="bg-amber-100 text-amber-800 p-3 rounded-full mr-4">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800">示例说明</h2>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="bg-amber-50 rounded-lg p-4">
+                        <h3 class="font-semibold text-amber-800 mb-2">合法状态</h3>
+                        <p class="text-sm text-slate-600"><code class="bg-slate-200 px-1 rounded">s=0b11111111</code>：所有任务对均完成。</p>
+                    </div>
+                    
+                    <div class="bg-amber-50 rounded-lg p-4">
+                        <h3 class="font-semibold text-amber-800 mb-2">非法状态</h3>
+                        <p class="text-sm text-slate-600"><code class="bg-slate-200 px-1 rounded">s=0b10101010</code>：每对仅完成一个节点，不合法。</p>
+                    </div>
+                    
+                    <div class="bg-amber-50 rounded-lg p-4">
+                        <h3 class="font-semibold text-amber-800 mb-2">状态拆分</h3>
+                        <p class="text-sm text-slate-600"><code class="bg-slate-200 px-1 rounded">s=0b11110000</code>可拆分为<code class="bg-slate-200 px-1 rounded">subs=0b11000000</code>和<code class="bg-slate-200 px-1 rounded">s^subs=0b00110000</code>，均为合法子状态。</p>
+                    </div>
+                </div>
+                
+                <div class="mt-6 bg-slate-50 rounded-lg p-5">
+                    <p class="text-slate-600">假设任务对为<code class="bg-slate-200 px-1 rounded">(A1, A2)</code>, <code class="bg-slate-200 px-1 rounded">(B1, B2)</code>, <code class="bg-slate-200 px-1 rounded">(C1, C2)</code>, <code class="bg-slate-200 px-1 rounded">(D1, D2)</code>：</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 总结 -->
+        <div class="card bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="p-6 md:p-8">
+                <div class="flex items-center mb-6">
+                    <div class="bg-indigo-100 text-indigo-800 p-3 rounded-full mr-4">
+                        <i class="fas fa-check-circle text-xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800">总结</h2>
+                </div>
+                
+                <div class="bg-indigo-50 rounded-lg p-5">
+                    <p class="text-slate-600">这段代码通过动态规划与状态压缩技术，高效计算了覆盖所有成对任务的最小路径代价，确保每一步状态转移合法且最优，最终输出全局最优解。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <div class="mt-12 pt-6 border-t border-slate-200 text-center text-sm text-slate-500">
+            <p>网页由问小白生成，仅供参考</p>
+            <p class="mt-1">最后更新时间为2025-05-14 ，星期三</p>
+            <p class="mt-1">问小白网址：<a href="https://wenxiaobai.com" class="text-blue-600 hover:underline">wenxiaobai.com</a></p>
+        </div>
+    </div>
+
+    <script>
+        // 平滑滚动效果
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
